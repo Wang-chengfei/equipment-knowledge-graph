@@ -17,12 +17,13 @@ if __name__ == '__main__':
         relation_type = relation.split("/")[3]
         relation_list.append(relation_type)
     processed_equipment_list = []
+    print(relation_list)
 
     # 开始处理
     discard_list = ["", ",", "/", "[", "]", "citation needed", "and", "now", "at", "&", "later",
                     "then", "of", "hybrid", "–", "see",  "{", "}", "none", ":", "in", "x", ";",
                     "!", "(", ")", "view", "part of", "from", "avre", "list", "project", "short",
-                    "long-range", "large", "medium", "big", "users", "army"]
+                    "long-range", "large", "medium", "big", "army"]
     content_num = 0
     name_num = 0
     repetition_num = 0
@@ -35,21 +36,21 @@ if __name__ == '__main__':
                 repetition_flag = True
         if repetition_flag:
             repetition_num += 1
-            print("重复筛选:", equipment["name"], equipment["wiki_url"])
-            continue
-        # 内容筛选
-        relation_count = 0
-        for key in equipment["table_info"]["Totality"].keys():
-            if key in relation_list:
-                relation_count += 1
-        if len(equipment["table_info"]["Specification"]) == 0 or relation_count < 2:
-            content_num += 1
-            print("内容筛选:", equipment["name"], equipment["wiki_url"])
+            # print("重复筛选:", equipment["name"], equipment["wiki_url"])
             continue
         # 名称筛选
         if re.search(r"[^A-Za-z0-9 -]", equipment["name"]) is not None:
             name_num += 1
-            print("名称筛选:", equipment["name"], equipment["wiki_url"])
+            # print("名称筛选:", equipment["name"], equipment["wiki_url"])
+            continue
+        # 内容筛选
+        relation_count = 0
+        for key in equipment["table_info"]["Totality"].keys():
+            if key in relation_list or key == "Armament":
+                relation_count += 1
+        if len(equipment["table_info"]["Specification"]) == 0 or relation_count < 2:
+            content_num += 1
+            # print("内容筛选:", equipment["name"], equipment["wiki_url"])
             continue
 
         # print("未被筛选的实体：", equipment["name"], equipment["wiki_url"])
@@ -64,9 +65,6 @@ if __name__ == '__main__':
         processed_equipment["attribute"] = dict()
         equipment_items = dict(equipment["table_info"]["Specification"], **equipment["table_info"]["Totality"])
         for key, value in equipment_items.items():
-            key = unicodedata.normalize(config.normalize_signature, key)
-            key = re.sub(r" +", " ", key)
-            key = key.strip()
             # 处理字符串数据（属性）
             if isinstance(value, str):
                 value = unicodedata.normalize(config.normalize_signature, value)
@@ -148,9 +146,9 @@ if __name__ == '__main__':
                             add_flag = False
                         elif "operator" in war.lower() or "below" in war.lower():
                             add_flag = False
-                        elif war.startswith("-") or war.endswith("-") or war.startswith("."):
+                        elif war.startswith("-") or war.startswith("from ") or war.startswith("."):
                             add_flag = False
-                        elif war.endswith("by") or war.startswith("from") or war.endswith("in"):
+                        elif war.endswith(" by") or war.endswith("-") or war.endswith(" in"):
                             add_flag = False
                         # 检查是否在之前出现过
                         for item in content:

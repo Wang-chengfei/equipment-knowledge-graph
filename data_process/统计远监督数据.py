@@ -9,6 +9,35 @@ if __name__ == '__main__':
         data_list = json.load(fp)
     print("数据个数:", len(data_list))
 
+    # 统计重叠类型数量
+    Normal = 0
+    EPO = 0
+    SEO = 0
+    for data in data_list:
+        is_EPO = False
+        is_SEO = False
+        for idx, relationMention in enumerate(data["relationMentions"]):
+            em1Text = relationMention["em1Text"]
+            em2Text = relationMention["em2Text"]
+            label = relationMention["label"]
+            for relationMention2 in data["relationMentions"][idx + 1:]:
+                em1Text2 = relationMention2["em1Text"]
+                em2Text2 = relationMention2["em2Text"]
+                label2 = relationMention2["label"]
+                if em1Text == em1Text2 and em2Text == em2Text2:
+                    is_EPO = True
+                elif em1Text == em1Text2 or em2Text == em2Text2:
+                    is_SEO = True
+        if is_EPO:
+            EPO += 1
+        if is_SEO:
+            SEO += 1
+        if not is_EPO and not is_SEO:
+            Normal += 1
+    print("Normal:", Normal)
+    print("EPO:", EPO)
+    print("SEO:", SEO)
+
     # 统计不同关系类别的数量
     for data in data_list:
         for relationMention in data["relationMentions"]:
@@ -42,8 +71,6 @@ if __name__ == '__main__':
         print(key, ":", len(value))
         total_number += len(value)
     print("实体总数:", total_number)
-
-
 
     # 绘图
     plt.xticks(rotation=350)

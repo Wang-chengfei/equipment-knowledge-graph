@@ -1,6 +1,8 @@
 from lxml import etree
 from config import Config
 from utils import *
+import re
+import unicodedata
 
 
 def get_equipment_info(url, config):
@@ -23,7 +25,7 @@ def get_equipment_info(url, config):
     # 提取描述性文本
     equipment["text_info"] = dict()
     # 提取描述性文本——所有
-    document = tree.xpath('//*[@id="mw-content-text"]/div[@class="mw-parser-output"]/p//text()')
+    document = tree.xpath('//*[@id="mw-content-text"]/div[@class="mw-parser-output"]//p//text()')
     equipment["text_info"]["document"] = list2sentence(document).strip()
     # # 提取描述性文本——简述
     # h2_label_list = tree.xpath('//*[@id="mw-content-text"]/div[@class="mw-parser-output"]/h2')
@@ -67,6 +69,8 @@ def get_equipment_info(url, config):
             for i in titles:
                 if '.' not in i:
                     title = title + i + ' '
+            title = unicodedata.normalize(config.normalize_signature, title)
+            title = re.sub(r" +", " ", title)
             title = title.strip()
 
             # 丢弃Variants与References
@@ -76,7 +80,8 @@ def get_equipment_info(url, config):
             # 特殊处理 "See" "Varies" "View"
             if contents[0].lower().startswith("see") or \
                     contents[0].lower().startswith("varies") or \
-                    contents[0].lower().startswith("view"):
+                    contents[0].lower().startswith("view") or \
+                    contents[0].lower().startswith("users"):
                 if is_specification:
                     continue
                 else:
@@ -97,23 +102,28 @@ def get_equipment_info(url, config):
                     content = search_list
 
             # 特殊处理可能为列表的数据，包括Wars, Place of origin, Used by, Type, Manufacturer, Designer
-            elif title.startswith("Place") or title.startswith("Used") or title in ["Wars", "Type", "Manufacturer", "Designer"]:
+            elif title in ["Place of origin", "Used by", "Wars", "Type", "Manufacturer", "Designer"]:
                 content = contents
-
-            # 特殊处理armament
-            elif "armament" in title.lower():
-                content = tr.xpath('./td//a/text()')
 
             # 一般情况处理
             else:
                 for i in contents:
                     content = content + i + ' '
                 content = content.strip()
+
             if is_specification:
                 equipment["table_info"]["Specification"][title] = content
             else:
                 equipment["table_info"]["Totality"][title] = content
+
+            # 特殊处理armament
             if "armament" in title.lower():
+                armament_list = tr.xpath('./td//a/@href')
+                content = []
+                for armament in armament_list:
+                    if armament.startswith("/wiki/"):
+                        armament = armament[6:].replace("_", " ")
+                        content.append(armament)
                 title = "Armament"
                 if title not in equipment["table_info"]["Totality"].keys():
                     equipment["table_info"]["Totality"][title] = []
@@ -126,7 +136,7 @@ def get_equipment_info(url, config):
 if __name__ == '__main__':
     config = Config()
     # url = config.example_url
-    url = "https://en.wikipedia.org/wiki/T54"
+    url = "https://en.wikipedia.org/wiki/Assault_gun"
     equipment = get_equipment_info(url=url, config=config)
     # 写入json文件
     with open(config.raw_data_example_path, 'w') as f:

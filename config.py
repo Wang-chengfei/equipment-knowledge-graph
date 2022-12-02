@@ -16,15 +16,19 @@ class Config(object):
         # data directory
         parser.add_argument('--raw_data_path', type=str, default='../data/raw_data.json',
                             help='爬取到的原始数据')
+        parser.add_argument('--raw_sentence_path', type=str, default='../data/raw_sentence.json',
+                            help='爬取到的原始句子')
         parser.add_argument('--raw_data_example_path', type=str, default='../data/raw_data_example.json',
                             help='爬取到的原始示例数据')
         parser.add_argument('--url_equipment_list_path', type=str, default='../data/url_equipment_list.json',
                             help='将要爬取的装备url列表')
         parser.add_argument('--webpage_data_path', type=str, default='../data/webpage_data.json',
                             help='网页数据')
+        parser.add_argument('--webpage_bingSearch_path', type=str, default='../data/webpage_bingSearch.json',
+                            help='bing搜索结果')
         parser.add_argument('--webpage_sentence_path', type=str, default='../data/webpage_sentence.json',
-                            help='网页数据，用于爬取句子')
-        parser.add_argument('--url_sentence_list_path', type=str, default='../data/url_sentence_list.json',
+                            help='采集句子的网页数据')
+        parser.add_argument('--bingSearch_result_path', type=str, default='../data/bingSearch_result.json',
                             help='用于爬取句子的url列表')
         parser.add_argument('--relation2id_path', type=str, default='../data/relation2id.json',
                             help='关系与id对应文件')

@@ -11,14 +11,13 @@ def clean_str(string):
     清洗句子
     """
     # string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
-    string = re.sub(r"\'s", " 's", string)
-    string = re.sub(r"\'ve", " 've", string)
-    string = re.sub(r"n\'t", " n't", string)
-    string = re.sub(r"\'re", " 're", string)
-    string = re.sub(r"\'d", " 'd", string)
-    string = re.sub(r"\'ll", " 'll", string)
+    string = re.sub(r"\'s", " \'s", string)
+    string = re.sub(r"\'ve", " \'ve", string)
+    string = re.sub(r"n\'t", " n\'t", string)
+    string = re.sub(r"\'re", " \'re", string)
+    string = re.sub(r"\'d", " \'d", string)
+    string = re.sub(r"\'ll", " \'ll", string)
     string = re.sub(r";", " ; ", string)
-    string = re.sub(r"\.", " . ", string)
     string = re.sub(r",", " , ", string)
     string = re.sub(r"!", " ! ", string)
     string = re.sub(r"\(", " ( ", string)
@@ -32,37 +31,27 @@ if __name__ == '__main__':
     config = Config()
     nlp = spacy.load("en_core_web_sm")
     sentence_list = []
-    with open(config.raw_data_path, 'r', encoding='utf8') as fp:
-        equipment_list = json.load(fp)
+    with open(config.raw_sentence_path, 'r', encoding='utf8') as fp:
+        document_list = json.load(fp)
 
     # 开始处理
-    # for equipment in tqdm(equipment_list, total=len(equipment_list)):
-    #     sentences = equipment["text_info"]["document"].split(".")
-    #     for sentence in sentences:
-    #         sentence = unicodedata.normalize(config.normalize_signature, sentence)
-    #         sentence = re.sub(r"\[.*?\]", "", sentence)
-    #         sentence = re.sub(r"\(.*?\)", "", sentence)
-    #         sentence = re.sub(r"\{.*?\}", "", sentence)
-    #         sentence = clean_str(sentence)
-    #         sentence = sentence.strip() + " ."
-    #         sentence_list.append(sentence)
-
-    for equipment in tqdm(equipment_list, total=len(equipment_list)):
-        sentences = equipment["text_info"]["document"]
+    for document in tqdm(document_list, total=len(document_list)):
+        sentences = document["document"]
         sentences = unicodedata.normalize(config.normalize_signature, sentences)
         sentences = re.sub(r"\[.*?\]", "", sentences)
         sentences = re.sub(r"\(.*?\)", "", sentences)
         sentences = re.sub(r"\{.*?\}", "", sentences)
         sentences = re.sub(r"\s{2,}", " ", sentences)
+        print(sentences)
         sentences = nlp(sentences).sents
         for sentence in sentences:
+            # print(sentence.text)
             sentence = sentence.text
-            sentence = unicodedata.normalize(config.normalize_signature, sentence)
+            # sentence = unicodedata.normalize(config.normalize_signature, sentence)
             sentence = re.sub(r"\[.*?\]", "", sentence)
             sentence = re.sub(r"\(.*?\)", "", sentence)
-            sentence = re.sub(r"\{.*?\}", "", sentence)
             sentence = clean_str(sentence)
-            # sentence = sentence.strip() + " ."
+            sentence = sentence.strip() + " ."
             sentence_list.append(sentence)
 
     print("去重前：", len(sentence_list))
