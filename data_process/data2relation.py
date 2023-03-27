@@ -100,7 +100,7 @@ if __name__ == '__main__':
                     if content.endswith(" and"):
                         content = content[:len(content) - 4]
                     content = re.sub(r" +", " ", content)
-                    content = content.strip().lower()
+                    content = content.strip()
                     value = []
                     if "/" in content:
                         for item in content.split("/"):
@@ -194,4 +194,5 @@ if __name__ == '__main__':
     print("重复筛选", repetition_num)
     with open(config.processed_data_path, 'w') as f:
         json.dump(processed_equipment_list, f)
-    print(len(processed_equipment_list))
+    print("数据已写入至：", config.processed_data_path)
+    print("装备个数：", len(processed_equipment_list))

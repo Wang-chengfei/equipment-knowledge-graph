@@ -29,6 +29,7 @@ if __name__ == '__main__':
     # 开始写入
     for equipment in tqdm(equipment_list, total=len(equipment_list)):
         entity_type = "equipment"
+        equipment["name"] = equipment["name"].lower()
         equipment_node = node_matcher.match(entity_type).where(name=equipment["name"]).first()
         if equipment_node is None:
             equipment_node = Node(entity_type, name=equipment["name"])
@@ -39,7 +40,7 @@ if __name__ == '__main__':
         for key, value in equipment["relation"].items():
             # 处理字符串值
             if isinstance(value, str):
-                entity_name = value
+                entity_name = value.lower()
                 entity_type = relation2entity[key]
                 this_node = node_matcher.match(entity_type).where(name=entity_name).first()
                 if this_node is None:
@@ -50,6 +51,7 @@ if __name__ == '__main__':
             # 处理列表值
             elif isinstance(value, list):
                 for entity_name in value:
+                    entity_name = entity_name.lower()
                     entity_type = relation2entity[key]
                     this_node = node_matcher.match(entity_type).where(name=entity_name).first()
                     if this_node is None:

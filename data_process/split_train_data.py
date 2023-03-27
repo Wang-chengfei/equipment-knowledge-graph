@@ -9,6 +9,19 @@ if __name__ == '__main__':
         data_list = json.load(fp)
     print("训练数据总数：", len(data_list))
 
+    # 句长统计及筛选
+    new_data_list = []
+    sentence_len = dict()
+    for sentence in data_list:
+        word_list = sentence["sentText"].split(" ")
+        word_len = len(word_list)
+        if 8 <= word_len <= 80:
+            new_data_list.append(sentence)
+        sentence_len[word_len] = sentence_len.get(word_len, 0) + 1
+    sentence_len = dict(sorted(sentence_len.items(), key=lambda i: i[0], reverse=True))
+    print("句长统计", sentence_len)
+    data_list = new_data_list
+
     # 去重
     new_data_list = []
     for data in data_list:
@@ -30,16 +43,22 @@ if __name__ == '__main__':
     data_list = new_data_list
 
     # 划分数据集
-    random.seed(config.random_seed)
-    random.shuffle(data_list)
+    # random.seed(config.random_seed)
+    # random.shuffle(data_list)
     test_len = int(len(data_list) * config.test_ratio)
-    test_data = data_list[:test_len]
-    valid_data = data_list[test_len:2 * test_len]
-    train_data = data_list[2 * test_len:]
+    if config.need_test:
+        test_data = data_list[:test_len]
+        valid_data = data_list[test_len:2 * test_len]
+        train_data = data_list[2 * test_len:]
+    else:
+        test_data = []
+        valid_data = data_list[:test_len]
+        train_data = data_list[test_len:]
     print("test data number:", len(test_data))
     print("valid data number:", len(valid_data))
     print("train data number:", len(train_data))
     print("Overall:", len(data_list))
+
     # 写入json文件
     with open(config.test_path, 'w') as f:
         json.dump(test_data, f)
@@ -47,5 +66,3 @@ if __name__ == '__main__':
         json.dump(valid_data, f)
     with open(config.train_path, 'w') as f:
         json.dump(train_data, f)
-    with open(config.all_train_path, 'w') as f:
-        json.dump(data_list, f)

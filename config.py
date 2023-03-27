@@ -80,6 +80,8 @@ class Config(object):
         # data process
         parser.add_argument('--normalize_signature', type=str, default='NFKC',
                             help='unicodedata.normalize(normalize_signature, text)')
+        parser.add_argument('--need_test', type=bool, default=False,
+                            help='是否需要测试集数据')
         parser.add_argument('--test_ratio', type=float, default=0.1,
                             help='测试数据比例')
         parser.add_argument('--random_seed', type=int, default=2022,

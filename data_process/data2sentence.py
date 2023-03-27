@@ -24,6 +24,14 @@ def clean_str(string):
     string = re.sub(r"\(", " ( ", string)
     string = re.sub(r"\)", " ) ", string)
     string = re.sub(r"\?", " ? ", string)
+    string = re.sub(r"\n", " ", string)
+    string = re.sub(r"\"", " ", string)
+    string = re.sub(r"\(", "", string)
+    string = re.sub(r"\)", "", string)
+    string = re.sub(r"\[", "", string)
+    string = re.sub(r"\]", "", string)
+    string = re.sub(r"\{", "", string)
+    string = re.sub(r"\}", "", string)
     string = re.sub(r"\s{2,}", " ", string)
     return string.strip()
 
@@ -47,22 +55,20 @@ if __name__ == '__main__':
     #         sentence = sentence.strip() + " ."
     #         sentence_list.append(sentence)
 
+    # equipment_list = equipment_list[:10]
     for equipment in tqdm(equipment_list, total=len(equipment_list)):
         sentences = equipment["text_info"]["document"]
         sentences = unicodedata.normalize(config.normalize_signature, sentences)
         sentences = re.sub(r"\[.*?\]", "", sentences)
-        sentences = re.sub(r"\(.*?\)", "", sentences)
+        # sentences = re.sub(r"\(.*?\)", "", sentences)
         sentences = re.sub(r"\{.*?\}", "", sentences)
-        sentences = re.sub(r"\s{2,}", " ", sentences)
         sentences = nlp(sentences).sents
         for sentence in sentences:
             sentence = sentence.text
-            sentence = unicodedata.normalize(config.normalize_signature, sentence)
             sentence = re.sub(r"\[.*?\]", "", sentence)
             sentence = re.sub(r"\(.*?\)", "", sentence)
             sentence = re.sub(r"\{.*?\}", "", sentence)
             sentence = clean_str(sentence)
-            # sentence = sentence.strip() + " ."
             sentence_list.append(sentence)
 
     print("去重前：", len(sentence_list))
@@ -81,3 +87,4 @@ if __name__ == '__main__':
     # 写入json文件
     with open(config.processed_sentence_path, 'w') as f:
         json.dump(sentence_list, f)
+    print("数据已写入至：", config.processed_sentence_path)

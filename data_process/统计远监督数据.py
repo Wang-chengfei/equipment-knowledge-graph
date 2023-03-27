@@ -69,6 +69,9 @@ if __name__ == '__main__':
     total_number = 0
     for key, value in entity.items():
         print(key, ":", len(value))
+        for entity_name in value:
+            print(value)
+        print()
         total_number += len(value)
     print("实体总数:", total_number)
 
