@@ -66,11 +66,12 @@ if __name__ == '__main__':
                 entity[em2Type] = set()
             entity[em2Type].add(em2Text)
 
+    # 打印实体类别和名称
     total_number = 0
     for key, value in entity.items():
         print(key, ":", len(value))
         for entity_name in value:
-            print(value)
+            print(entity_name)
         print()
         total_number += len(value)
     print("实体总数:", total_number)

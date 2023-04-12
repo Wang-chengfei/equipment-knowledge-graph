@@ -26,8 +26,8 @@ if __name__ == '__main__':
     print()
 
     # 删除某节点
-    # del_node = node_matcher.match("company").where(name="; rmmv would now be the design parent").first()
-    # graph.delete(del_node)
+    del_node = node_matcher.match("war").where(name="afghanistan").first()
+    graph.delete(del_node)
 
     # 打印某种类别的所有node
     for node in company_nodes:
